@@ -1,6 +1,6 @@
 import express from 'express';
 import DiretorController from '../controllers/diretorController.js';
-import { diretor } from '../models/Diretor.js';
+import diretor from '../models/Diretor.js';
 
 // Carrega as funcionalidades que precisamos para gerenciar e trabalhar com rotas
 const routes = express.Router();

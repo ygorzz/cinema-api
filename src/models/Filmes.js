@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import {diretorSchema} from './Diretor.js'
 
 const filmeSchema = new mongoose.Schema({
     id: {type: mongoose.Schema.Types.ObjectId},
@@ -7,7 +6,7 @@ const filmeSchema = new mongoose.Schema({
     genero: {type: String},
     anoLancamento: {type: Number},
     duracaoMinutos: {type: Number},
-    diretor: diretorSchema
+    diretor: {type: mongoose.Schema.Types.ObjectId, ref: "diretores", required: true} // Usando referência
 }, {versionKey: false});
 
 const filme = mongoose.model("filmes", filmeSchema);

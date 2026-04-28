@@ -1,5 +1,5 @@
 import filme from '../models/Filmes.js';
-import { diretor } from '../models/Diretor.js';
+import diretor from '../models/Diretor.js';
 
 class FilmeController {
 
@@ -8,10 +8,12 @@ class FilmeController {
         const {genero} = req.query;
         const filtro = genero ? {genero} : {};
         try {
-            const listaFilmes = await filme.find(filtro);
+            // populate() -> resolve a referência / traz os dados da coleção 'diretores' - que é referenciada pelo id em 'filmes' - para a prop 'diretor' de 'filmes'
+            // exec() -> executa a query 
+            const listaFilmes = await filme.find(filtro).populate("diretor").exec();
             res.status(200).json({ filmes: listaFilmes });
         } catch (error) {
-            res.status(500).json({ message: `falha ao listar filmes - ${error.message}` });
+            res.status(500).json({ message: `falha ao listar filmes - ${error.message}` })  ;
         };
     };
 
@@ -26,12 +28,9 @@ class FilmeController {
     };
 
     static async cadastrarFilme(req, res) {
-        const dadosFilme = req.body;
-        const idDiretor = req.body.diretor;
+        const novoFilme = req.body;
         try {
-            const diretorBuscado = await diretor.findById(idDiretor); // Busca o diretor correspondente ao filme pelo id
-            const filmeCompleto = { ...dadosFilme, diretor: diretorBuscado }; // Constrói o objeto final
-            const filmeCadastrado = await filme.create(filmeCompleto);
+            const filmeCadastrado = await filme.create(novoFilme);
             res.status(201).json({ message: 'Filme cadastrado com sucesso', filme: filmeCadastrado._doc });
         } catch (error) {
             res.status(500).json({ message: `falha ao cadastrar filme - ${error.message}` });

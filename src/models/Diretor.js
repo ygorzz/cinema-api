@@ -8,4 +8,4 @@ const diretorSchema = new mongoose.Schema({
 
 const diretor = mongoose.model("diretores", diretorSchema);
 
-export {diretor, diretorSchema};
+export default diretor;

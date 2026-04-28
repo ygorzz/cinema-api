@@ -6,6 +6,8 @@ API REST para gerenciamento de um catálogo de cinema, permitindo o cadastro e a
 
 A API segue a arquitetura MVC (Model-View-Controller), com separação clara de responsabilidades entre modelos de dados, lógica de negócio e definição de rotas.
 
+A diferença do projeto dessa branch é o uso da **Referência** como abordagem para a modelagem dos dados entre as coleções **filmes** e **diretores**.
+
 ---
 
 ## Tecnologias utilizadas
@@ -107,7 +109,7 @@ Este projeto consolidou os seguintes conceitos e práticas:
 - **Arquitetura MVC** — Separação de responsabilidades entre models, controllers e routes, tornando o código mais organizado, legível e manutenível.
 - **Express Router** — Uso de `express.Router()` para modularizar as rotas e centralizar seu registro via um arquivo `index.js`.
 - **Mongoose** — Definição de schemas tipados, uso de `model.find()`, `findById()`, `create()`, `findByIdAndUpdate()` e `findByIdAndDelete()`.
-- **Relacionamento embutido (embedded document)** — O schema de `Diretor` é reutilizado dentro do schema de `Filme`, demonstrando a estratégia de embedding do MongoDB.
+- **Referencing** — O schema de `Diretor` é referenciado pelo id dentro do schema de `Filme`, demonstrando a estratégia de referencing do MongoDB.
 - **Variáveis de ambiente** — Uso do `dotenv` para separar configurações sensíveis (como a string de conexão ao banco) do código-fonte.
 - **Padrão async/await** — Todas as operações de banco de dados são assíncronas, com tratamento de erros via `try/catch`.
 - **Query parameters** — Implementação de filtros opcionais via `req.query` para busca por gênero e por nacionalidade.

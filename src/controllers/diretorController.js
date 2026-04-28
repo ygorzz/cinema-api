@@ -1,4 +1,4 @@
-import {diretor} from '../models/Diretor.js';
+import diretor from '../models/Diretor.js';
 
 class DiretorController {
 
