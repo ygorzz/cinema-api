@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 export default async function conectaNoBD () {
-    mongoose.connect(process.env.DB_CONNECTION_STRING);
+  mongoose.connect(process.env.DB_CONNECTION_STRING);
 
-    return mongoose.connection;
+  return mongoose.connection;
 }

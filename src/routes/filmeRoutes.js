@@ -1,12 +1,13 @@
-import express from 'express';
+import express from "express";
 import FilmeController from "../controllers/filmeController.js";
 
 const routes = express.Router();
 
-routes.get("/filmes", FilmeController.listarFilmes);
-routes.get("/filmes/:id", FilmeController.buscarFilmePorId)
-routes.post("/filmes", FilmeController.cadastrarFilme);
-routes.put("/filmes/:id", FilmeController.atualizarFilme);
-routes.delete("/filmes/:id", FilmeController.removerFilme);
+routes
+  .get("/filmes", FilmeController.listarFilmes)
+  .get("/filmes/:id", FilmeController.buscarFilmePorId)
+  .post("/filmes", FilmeController.cadastrarFilme)
+  .put("/filmes/:id", FilmeController.atualizarFilme)
+  .delete("/filmes/:id", FilmeController.removerFilme);
 
 export default routes;
