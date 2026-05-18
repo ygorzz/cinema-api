@@ -19,13 +19,14 @@ class DiretorController {
 
       // Verifica se tem filtro ou não na url antes de realizar a busca
       const busca = processaBusca(req.query);
-      const { pagina, limite, skip } = req.paginacao;
+      const { pagina, limite, skip, campoOrdenacao, ordem } = req.paginacao;
 
       validaLimite(limite);
       const totalDocumentos = await diretor.countDocuments(busca);
       validaPagina(totalDocumentos, pagina, limite);
 
       const listaDiretores = await diretor.find(busca)
+        .sort({[campoOrdenacao] : ordem})
         .skip(skip)
         .limit(limite);
 
