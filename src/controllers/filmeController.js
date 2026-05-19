@@ -6,6 +6,7 @@ import enviaRespostaLista from "../helpers/enviaRespostaLista.js";
 import enviaRespostaObjeto from "../helpers/enviaRespostaObjeto.js";
 import validaPagina from "../helpers/validaPagina.js";
 import validaLimite from "../helpers/validaLimite.js";
+import escapeRegex from "../helpers/escapeRegex.js";
 
 const mensagemErro404 = "Não foi encontrado filme correspondente a esse id.";
 
@@ -26,12 +27,15 @@ class FilmeController {
 
       validaLimite(limite);
       const totalDocumentos = await filme.countDocuments(busca);
-      validaPagina(totalDocumentos, pagina, limite);
+      let listaFilmes = [];
 
-      const listaFilmes = await filme.find(busca)
-        .sort({[campoOrdenacao] : ordem})
-        .skip(skip)
-        .limit(limite);
+      if(totalDocumentos > 0){
+        validaPagina(totalDocumentos, pagina, limite);
+        listaFilmes = await filme.find(busca)
+          .sort({[campoOrdenacao] : ordem})
+          .skip(skip)
+          .limit(limite);
+      }
 
       enviaRespostaLista(listaFilmes, res);
     } catch (error) {
@@ -116,11 +120,17 @@ function processaBusca(busca) {
 
   const { genero, anoLancamento, titulo, diretor } = busca;
   const filtros = {};
-
+  
   if (genero) filtros.genero = genero;
   if (anoLancamento) filtros.anoLancamento = parseInt(anoLancamento);
-  if (titulo) filtros.titulo = { $regex: titulo, $options: "i" };
-  if (diretor) filtros.diretor = { $regex: diretor, $options: "i" };
+  if (titulo){
+    const tituloLimpo = escapeRegex(titulo); // Evita regex injections
+    filtros.titulo = { $regex: tituloLimpo, $options: "i" };
+  } 
+  if (diretor){
+    const diretorLimpo = escapeRegex(diretor); // Evita regex injections
+    filtros["diretor.nome"] = { $regex: diretorLimpo, $options: "i" }; 
+  }
 
   return filtros;
 }

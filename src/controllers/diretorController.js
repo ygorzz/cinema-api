@@ -22,13 +22,16 @@ class DiretorController {
       const { pagina, limite, skip, campoOrdenacao, ordem } = req.paginacao;
 
       validaLimite(limite);
-      const totalDocumentos = await diretor.countDocuments(busca);
-      validaPagina(totalDocumentos, pagina, limite);
+      const totalDocumentos = await diretor.countDocuments(busca); // para validar a página
+      let listaDiretores = [];
 
-      const listaDiretores = await diretor.find(busca)
-        .sort({[campoOrdenacao] : ordem})
-        .skip(skip)
-        .limit(limite);
+      if(totalDocumentos > 0){
+        validaPagina(totalDocumentos, pagina, limite);
+        listaDiretores = await diretor.find(busca)
+          .sort({[campoOrdenacao] : ordem})
+          .skip(skip)
+          .limit(limite);
+      }
 
       enviaRespostaLista(listaDiretores, res);
     } catch (error) {
