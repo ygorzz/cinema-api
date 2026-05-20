@@ -23,28 +23,47 @@ A aplicação utiliza **ES Modules** (`import`/`export`) nativamente.
 
 ---
 
+
 ## Estrutura do projeto
 
 ```
 cinema-api/
 ├── src/
+│   ├── app.js                    # Instância e configuração do Express
 │   ├── config/
-│   │   └── dbConnect.js          # Configuração e conexão com o MongoDB via Mongoose
+│   │   ├── dbConnect.js          # Conexão com o MongoDB via Mongoose
+│   │   └── mongooseValidations.js# Validações globais do Mongoose
 │   ├── controllers/
-│   │   ├── filmeController.js    # Lógica de negócio para filmes (CRUD)
-│   │   └── diretorController.js  # Lógica de negócio para diretores (CRUD)
+│   │   ├── diretorController.js  # Lógica de negócio para diretores (CRUD)
+│   │   └── filmeController.js    # Lógica de negócio para filmes (CRUD)
+│   ├── errors/
+│   │   ├── Erro404.js            # Erro para recurso não encontrado
+│   │   ├── ErroBase.js           # Classe base para erros customizados
+│   │   ├── ErroValidacao.js      # Erro para validações
+│   │   └── RequisicaoIncorreta.js# Erro para requisições inválidas
+│   ├── helpers/
+│   │   ├── enviaRespostaLista.js # Padroniza resposta de listas
+│   │   ├── enviaRespostaObjeto.js# Padroniza resposta de objetos
+│   │   ├── escapeRegex.js        # Sanitiza entradas para regex
+│   │   ├── validaLimite.js       # Valida limite de paginação
+│   │   └── validaPagina.js       # Valida número de página
+│   ├── middlewares/
+│   │   ├── manipulador404.js     # Middleware para 404
+│   │   ├── manipuladorDeErros.js # Middleware global de erros
+│   │   └── paginar.js            # Middleware de paginação e ordenação
 │   ├── models/
-│   │   ├── Filmes.js             # Schema e model Mongoose para filmes
-│   │   └── Diretor.js            # Schema e model Mongoose para diretores
-│   ├── routes/
-│   │   ├── index.js              # Centralizador de rotas da aplicação
-│   │   ├── filmeRoutes.js        # Definição das rotas de filmes
-│   │   └── diretorRoutes.js      # Definição das rotas de diretores
-│   └── app.js                    # Instância e configuração do Express
+│   │   ├── Diretor.js            # Schema/model de diretores
+│   │   └── Filmes.js             # Schema/model de filmes
+│   └── routes/
+│       ├── diretorRoutes.js      # Rotas de diretores
+│       ├── filmeRoutes.js        # Rotas de filmes
+│       └── index.js              # Centralizador de rotas
 ├── server.js                     # Ponto de entrada: conecta ao BD e sobe o servidor
 ├── .env                          # Variáveis de ambiente (não versionado)
 ├── .gitignore
-└── package.json
+├── eslint.config.js              # Configuração do ESLint
+├── package.json
+└── package-lock.json
 ```
 
 ---
@@ -55,12 +74,21 @@ cinema-api/
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `GET` | `/filmes` | Lista todos os filmes cadastrados |
-| `GET` | `/filmes?genero=<genero>` | Lista filmes filtrados por gênero |
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/filmes` | Lista todos os filmes cadastrados (suporta filtros, paginação e ordenação) |
+| `GET` | `/filmes?genero=<genero>&titulo=<titulo>&diretor=<nome>&anoLancamento=<ano>` | Lista filmes filtrados por gênero, título, diretor ou ano |
 | `GET` | `/filmes/:id` | Busca um filme pelo ID |
 | `POST` | `/filmes` | Cadastra um novo filme |
 | `PUT` | `/filmes/:id` | Atualiza os dados de um filme |
 | `DELETE` | `/filmes/:id` | Remove um filme |
+
+**Paginação e ordenação:**
+
+- Query params: `pagina`, `limite`, `ordenacao` (ex: `/filmes?pagina=2&limite=5&ordenacao=titulo:1`)
+- Ordenação: campo e ordem (1 = crescente, -1 = decrescente)
+
 
 **Campos do filme:**
 
@@ -69,12 +97,12 @@ cinema-api/
   "titulo": "string (obrigatório)",
   "genero": "string",
   "anoLancamento": "number",
-  "duracaoMinutos": "number",
-  "diretor": "<id do diretor>"
+  "duracaoMinutos": "number (80 a 180)",
+  "diretor": "<id do diretor> (obrigatório)"
 }
 ```
 
-> Ao cadastrar um filme, o ID do diretor é informado no campo `diretor`. A API busca o documento completo do diretor e o embute no registro do filme.
+> Ao cadastrar ou atualizar um filme, informe o ID do diretor. O documento do diretor será embutido no registro do filme.
 
 ---
 
@@ -82,12 +110,20 @@ cinema-api/
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `GET` | `/diretores` | Lista todos os diretores cadastrados |
-| `GET` | `/diretores?nacionalidade=<pais>` | Lista diretores filtrados por nacionalidade |
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/diretores` | Lista todos os diretores cadastrados (suporta filtros, paginação e ordenação) |
+| `GET` | `/diretores?nome=<nome>&nacionalidade=<pais>` | Lista diretores filtrados por nome ou nacionalidade |
 | `GET` | `/diretores/:id` | Busca um diretor pelo ID |
 | `POST` | `/diretores` | Cadastra um novo diretor |
 | `PUT` | `/diretores/:id` | Atualiza os dados de um diretor |
 | `DELETE` | `/diretores/:id` | Remove um diretor |
+
+**Paginação e ordenação:**
+
+- Query params: `pagina`, `limite`, `ordenacao` (ex: `/diretores?pagina=1&limite=10&ordenacao=nome:1`)
+
 
 **Campos do diretor:**
 
@@ -100,21 +136,24 @@ cinema-api/
 
 ---
 
-## Aprendizados
 
-Este projeto consolidou os seguintes conceitos e práticas:
+## Funcionalidades e diferenciais
 
-- **Arquitetura MVC** — Separação de responsabilidades entre models, controllers e routes, tornando o código mais organizado, legível e manutenível.
-- **Express Router** — Uso de `express.Router()` para modularizar as rotas e centralizar seu registro via um arquivo `index.js`.
-- **Mongoose** — Definição de schemas tipados, uso de `model.find()`, `findById()`, `create()`, `findByIdAndUpdate()` e `findByIdAndDelete()`.
-- **Relacionamento embutido (embedded document)** — O schema de `Diretor` é reutilizado dentro do schema de `Filme`, demonstrando a estratégia de embedding do MongoDB.
-- **Variáveis de ambiente** — Uso do `dotenv` para separar configurações sensíveis (como a string de conexão ao banco) do código-fonte.
-- **Padrão async/await** — Todas as operações de banco de dados são assíncronas, com tratamento de erros via `try/catch`.
-- **Query parameters** — Implementação de filtros opcionais via `req.query` para busca por gênero e por nacionalidade.
-- **ES Modules no Node.js** — Utilização de `import`/`export` em vez de `require`/`module.exports`.
-- **Inicialização segura do servidor** — O servidor HTTP só é iniciado após a conexão bem-sucedida com o banco de dados.
+- **Arquitetura MVC** — Separação clara entre models, controllers, rotas e middlewares.
+- **Express Router** — Modularização das rotas e centralização via arquivo index.js.
+- **Mongoose** — Schemas tipados, validações customizadas, uso de métodos como `find`, `findById`, `create`, `findByIdAndUpdate`, `findByIdAndDelete`.
+- **Relacionamento embutido** — O schema de Diretor é embutido no schema de Filme.
+- **Validações globais** — Campos string não podem ser enviados em branco (validação global do Mongoose).
+- **Paginação e ordenação** — Todas as rotas de listagem suportam paginação (`pagina`, `limite`) e ordenação (`ordenacao`).
+- **Filtros flexíveis** — Filmes podem ser filtrados por gênero, título, diretor e ano; diretores por nome e nacionalidade.
+- **Tratamento global de erros** — Middlewares para erros 404, validação, requisições incorretas e erros inesperados.
+- **Helpers reutilizáveis** — Funções para padronizar respostas, sanitizar entradas e validar limites/páginas.
+- **Variáveis de ambiente** — Uso do dotenv para separar configurações sensíveis.
+- **ES Modules** — Utilização de `import`/`export` nativamente.
+- **Linting** — Projeto configurado com ESLint para padronização de código.
 
 ---
+
 
 ## Como executar o projeto
 
@@ -148,22 +187,34 @@ DB_CONNECTION_STRING=mongodb+srv://<usuario>:<senha>@<cluster>.mongodb.net/<nome
 
 > Substitua os valores pelos dados da sua instância do MongoDB.
 
+
 **4. Inicie o servidor em modo de desenvolvimento:**
 
 ```bash
 npm run dev
 ```
 
-O servidor será iniciado na porta `3000`. Após a conexão com o banco ser estabelecida, a seguinte mensagem será exibida no terminal:
+O servidor será iniciado na porta `3000`. Após a conexão com o banco ser estabelecida, as mensagens abaixo serão exibidas no terminal:
 
 ```
 Conexão com o BD feita com sucesso
 Servidor rodando e aguardando requisição
 ```
 
+
 **5. Teste os endpoints:**
 
 Utilize uma ferramenta como [Postman](https://www.postman.com/) ou [Insomnia](https://insomnia.rest/) para interagir com a API em `http://localhost:3000`.
+
+---
+
+## Observações
+
+- O projeto utiliza validações customizadas e tratamento global de erros para garantir robustez.
+- O código segue padrão ESLint e utiliza ES Modules.
+- O arquivo `.env` **não** é versionado.
+
+---
 
 ---
 
