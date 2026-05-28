@@ -1,37 +1,19 @@
 import styled from "styled-components";
-import Title from "../CardsSections/Title/index.jsx";
+import Header from "../CardHeader/index.jsx";
+import CardBody from "../CardBody/index.jsx";
 
 const Card = styled.div`
   margin: 40px;
   height: calc(100% - 80px);
   width: 25%;
-  border: 1px solid #fff;
+  box-shadow: 0 4px 16px rgba(255, 253, 253, 0.15);
 `;
 
-const BodyContainer = styled.div`
-  height: calc(100% - 70px);
-`
-
-const FiltersContainer = styled.div`
-  
-`
-
-const FilterTitle = styled.h3`
-  color: #fff;
-  margin: 20px;
-  font-size: 22px;
-  font-weight: 100;
-`
-
-function CardModel({ titulo }) {
+function CardModel({ titulo, children }) {
   return (
     <Card>
-      <Title titulo={titulo}></Title>
-      <BodyContainer>
-        <FiltersContainer>
-          <FilterTitle>Filtros</FilterTitle>
-        </FiltersContainer>
-      </BodyContainer>
+      <Header titulo={titulo}></Header>
+      <CardBody children={children} />
     </Card>
   );
 }

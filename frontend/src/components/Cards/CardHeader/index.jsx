@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const TitleContainer = styled.div`
+const HeaderContainer = styled.div`
   display: flex;
   align-items: center;
   margin: 0;
@@ -8,19 +8,19 @@ const TitleContainer = styled.div`
   border: 1px solid #fff;
 `;
 
-const TitleContent = styled.h3`
+const Title = styled.h3`
   margin: 20px;
   font-size: 24px;
   font-weight: 100;
   color: #fff;
 `;
 
-function Title({titulo}) {
+function CardHeader({titulo}) {
   return (
-    <TitleContainer>
-      <TitleContent>{titulo}</TitleContent>
-    </TitleContainer>
+    <HeaderContainer>
+      <Title>{titulo}</Title>
+    </HeaderContainer>
   );
 }
 
-export default Title;
+export default CardHeader;
