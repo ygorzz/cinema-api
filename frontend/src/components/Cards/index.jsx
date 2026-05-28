@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import ListCard from "./CardsCrud/ListCard/index.jsx";
-import AddCard from "./CardsCrud/AddCard/index.jsx";
-import UpdateCard from "./CardsCrud/UpdateCard/index.jsx";
-import DeleteCard from "./CardsCrud/DeleteCard/index.jsx";
+import ListCard from "./ListCard/index.jsx";
+import AddCard from "./AddCard/index.jsx";
+import UpdateCard from "./UpdateCard/index.jsx";
+import DeleteCard from "./DeleteCard/index.jsx";
 
 const CardsContainer = styled.div`
   display: flex;
