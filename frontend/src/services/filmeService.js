@@ -14,7 +14,13 @@ async function deleteFilme(id){
     return response.data;
 }
 
+async function insertFilme(filme){
+    const response = await filmeAPI.post("/", filme)
+    return response.data;
+}
+
 export {
     getFilmes,
-    deleteFilme
+    deleteFilme,
+    insertFilme
 }

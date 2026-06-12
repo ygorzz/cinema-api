@@ -19,7 +19,7 @@ function UpdateCard() {
         <Input placeholder="Ano de Lançamento" />
         <Input placeholder="Duração em Minutos" />
         <Input placeholder="Diretor" />
-        <InputSubmit value="Atualizar" />
+        <InputSubmit defaultValue="Atualizar" />
       </Form>
     </UpdateContainer>
   );

@@ -41,7 +41,7 @@ function processaBusca(e) {
       filtros[input.name] = input.value;
     }
   }
-  return filtros;
+  return filtros; 
 }
 
 function ListCard() {
@@ -64,9 +64,12 @@ function ListCard() {
   }
 
   async function handleDeleteFilme(id) {
-    const data = await deleteFilme(id);
-    console.log(data);
-    alert(data.message);
+    try {
+      const data = await deleteFilme(id);
+      alert(data.message);
+    } catch (error) {
+      alert(error.response.data.message);
+    }
   }
 
   function renderResultado(filmes, mensagem) {
@@ -75,8 +78,8 @@ function ListCard() {
         <ResultadoContainer>
           {filmes.map((filme) => {
             return (
-              <Resultado> 
-                <p key={filme.id}>
+              <Resultado key={filme._id}> 
+                <p>
                   {filme.titulo}
                 </p>
                 <button onClick={() => handleDeleteFilme(filme._id)}>
@@ -111,7 +114,7 @@ function ListCard() {
         <Input placeholder="Diretor" name="diretor" />
         <Input placeholder="Ano de Lançamento" name="anoLancamento" />
         <Input placeholder="Ordenar" name="ordenacao" />
-        <InputSubmit value="Buscar" />
+        <InputSubmit defaultValue="Buscar" />
       </Form>
       {renderResultado(filmes, mensagem)}
     </ListContainer>
