@@ -8,8 +8,6 @@ import validaPagina from "../helpers/validaPagina.js";
 import validaLimite from "../helpers/validaLimite.js";
 import escapeRegex from "../helpers/escapeRegex.js";
 
-const mensagemErro404 = "Não foi encontrado filme correspondente a esse id.";
-
 class FilmeController {
 
   static async listarFilmes(req, res, next) {
@@ -48,7 +46,7 @@ class FilmeController {
 
     try {
       const filmeEncontrado = await filme.findById(id);
-      enviaRespostaObjeto(filmeEncontrado, res, mensagemErro404);
+      enviaRespostaObjeto(filmeEncontrado, res, "Filme retornado com sucesso");
     } catch (error) {
       next(error);
     };
@@ -59,21 +57,21 @@ class FilmeController {
     const dadosFilme = req.body;
     const tituloFilme = req.body.titulo;
     const idDiretor = req.body.diretor;
-
+    
     // Verificação antecipada para evitar consulta desnecessária no BD
     if (!tituloFilme || !idDiretor) {
       return next(new ErroValidacao("Titulo e diretor do filme são obrigatórios"));
     }
-
+    
     try {
       const diretorBuscado = await diretor.findById(idDiretor); // Busca o diretor correspondente ao id
       if (!diretorBuscado) {
         return next(new Erro404("Não foi encontrado diretor correspondente a esse ID."));
       }
-
+      console.log("ola");
       const filmeCompleto = { ...dadosFilme, diretor: diretorBuscado }; // Constrói o objeto final
       const filmeCadastrado = await filme.create(filmeCompleto);
-      enviaRespostaObjeto(filmeCadastrado, res, mensagemErro404);
+      enviaRespostaObjeto(filmeCadastrado, res, "Filme cadastrrado com sucesso");
 
     } catch (error) {
       next(error);
@@ -96,7 +94,7 @@ class FilmeController {
       }
 
       const filmeAtualizado = await filme.findByIdAndUpdate(id, atualizacao, { returnDocument: "after" });
-      enviaRespostaObjeto(filmeAtualizado, res, mensagemErro404);
+      enviaRespostaObjeto(filmeAtualizado, res, "Filme atualizado com sucesso");
     } catch (error) {
       next(error);
     };
@@ -108,7 +106,7 @@ class FilmeController {
 
     try {
       const filmeRemovido = await filme.findByIdAndDelete(id);
-      enviaRespostaObjeto(filmeRemovido, res, mensagemErro404);
+      enviaRespostaObjeto(filmeRemovido, res, "Filme removido com sucesso");
     } catch (error) {
       next(error);
     };

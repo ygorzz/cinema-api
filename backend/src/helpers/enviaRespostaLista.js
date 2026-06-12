@@ -1,3 +1,5 @@
+const message = "Não foram encontrados dados correspondentes com essa busca";
+
 export default function enviaRespostaLista(dadosBusca, res) {
 
   if (validaBuscaLista(dadosBusca)) {
@@ -5,7 +7,7 @@ export default function enviaRespostaLista(dadosBusca, res) {
   } else {
     return res.status(200).json({
       result: dadosBusca,
-      message: "Não foram encontrados dados correspondentes com essa busca"
+      message: message  
     });
   }
 }
