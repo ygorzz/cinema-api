@@ -19,8 +19,14 @@ async function insertFilme(filme){
     return response.data;
 }
 
+async function updateFilme({id, ...atualizacao}){
+    const response = await filmeAPI.patch(`${id}`, atualizacao)
+    return response;
+}
+
 export {
     getFilmes,
     deleteFilme,
-    insertFilme
+    insertFilme,
+    updateFilme
 }

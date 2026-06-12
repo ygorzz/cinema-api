@@ -4,20 +4,20 @@ import { Input, Form, InputSubmit } from "../../Inputs/index.jsx";
 import Subtitle from "../Subtitle/index.jsx";
 import { deleteFilme, getFilmes } from "../../../services/filmeService.js";
 import { useState } from "react";
-import { Trash } from "lucide-react"
+import { Trash } from "lucide-react";
 
 const ListContainer = styled(CardModel)``;
 
 const ResultadoContainer = styled.div`
-display: flex;
-flex-direction: column;
-align-items: center;
-`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
 const Resultado = styled.div`
-display: flex;
-align-items: center;
-gap: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
   color: white;
   p {
     font-size: 18px;
@@ -41,7 +41,7 @@ function processaBusca(e) {
       filtros[input.name] = input.value;
     }
   }
-  return filtros; 
+  return filtros;
 }
 
 function ListCard() {
@@ -78,16 +78,10 @@ function ListCard() {
         <ResultadoContainer>
           {filmes.map((filme) => {
             return (
-              <Resultado key={filme._id}> 
-                <p>
-                  {filme.titulo}
-                </p>
+              <Resultado key={filme._id}>
+                <p>{filme.titulo}</p>
                 <button onClick={() => handleDeleteFilme(filme._id)}>
-                  <Trash 
-                    size={18} 
-                    color="white"
-                    strokeWidth={2}
-                  />
+                  <Trash size={18} color="white" strokeWidth={2} />
                 </button>
               </Resultado>
             );

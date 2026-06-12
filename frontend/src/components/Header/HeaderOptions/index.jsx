@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const Options = styled.ul`
@@ -6,17 +7,17 @@ const Options = styled.ul`
 `;
 
 const Option = styled.li`
-  padding: 0 18px;
-  font-size: 26px;
-  display: flex;
-  align-items: center;
 `;
 
 function HeaderOptions() {
   return (
     <Options>
-      <Option>Filmes</Option>
-      <Option>Diretores</Option>
+      <Link to={"/filmes"}>
+        <Option>Filmes</Option>
+      </Link>
+      <Link to={"/diretores"}>
+        <Option>Diretores</Option>
+      </Link>
     </Options>
   );
 }

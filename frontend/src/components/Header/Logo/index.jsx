@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const Title = styled.h2`
@@ -7,7 +8,9 @@ const Title = styled.h2`
 
 function Logo(){
     return (
-        <Title>CinemaAPI</Title>
+        <Link to="/filmes">
+            <Title>CinemaAPI</Title>
+        </Link>
     )
 }
 
