@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import ListCard from "./ListCard/index.jsx";
 import AddCard from "./AddCard/index.jsx";
-import UpdateCard from "./UpdateCard/index.jsx";
 
 const CardsContainer = styled.div`
   display: flex;
@@ -10,14 +9,13 @@ const CardsContainer = styled.div`
   width: 100%;
 `;
 
-function Cards() {
+function CardsDiretores() {
   return (
     <CardsContainer>
       <ListCard />
       <AddCard />
-      <UpdateCard />
     </CardsContainer>
   );
 }
 
-export default Cards;
+export default CardsDiretores;

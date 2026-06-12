@@ -4,8 +4,6 @@ import validaLimite from "../helpers/validaLimite.js";
 import validaPagina from "../helpers/validaPagina.js";
 import { diretor } from "../models/Diretor.js";
 
-const mensagemErro404 = "Não foi encontrado diretor correspondente a esse ID.";
-
 class DiretorController {
 
   static async listarDiretores(req, res, next) {
@@ -45,7 +43,7 @@ class DiretorController {
 
     try {
       const diretorEncontrado = await diretor.findById(id);
-      enviaRespostaObjeto(diretorEncontrado, res, mensagemErro404);
+      enviaRespostaObjeto(diretorEncontrado, res, "Diretor retornado com sucesso");
     } catch (error) {
       next(error);
     };
@@ -56,7 +54,7 @@ class DiretorController {
     try {
       // create -> valida campos required antes de executar a operação no BD
       const diretorCadastrado = await diretor.create(req.body);
-      enviaRespostaObjeto(diretorCadastrado, res);
+      enviaRespostaObjeto(diretorCadastrado, res, "Diretor cadastrado com sucesso");
     } catch (error) {
       next(error);
     };
@@ -69,18 +67,18 @@ class DiretorController {
 
     try {
       const diretorAtualizado = await diretor.findByIdAndUpdate(id, atualizacao, { returnDocument: "after" });
-      enviaRespostaObjeto(diretorAtualizado, res, mensagemErro404);
+      enviaRespostaObjeto(diretorAtualizado, res, "Diretor atualizado com sucesso");
     } catch (error) {
       next(error);
     };
   };
 
   static async removerDiretor(req, res, next) {
-
+    
     try {
       const id = req.params.id;
       const diretorRemovido = await diretor.findByIdAndDelete(id);
-      enviaRespostaObjeto(diretorRemovido, res, mensagemErro404);
+      enviaRespostaObjeto(diretorRemovido, res, "Diretor removido com sucesso");
     } catch (error) {
       next(error);
     };

@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import CardModel from "../CardModel/index.jsx";
-import { Input, Form, InputSubmit, Select, Option } from "../../Inputs/index.jsx";
-import Subtitle from "../Subtitle/index.jsx";
-import { insertFilme } from "../../../services/filmeService.js";
+import CardModel from "../../CardModel/index.jsx";
+import { Input, Form, InputSubmit, Select, Option } from "../../../Inputs/index.jsx";
+import Subtitle from "../../Subtitle/index.jsx";
+import { insertFilme } from "../../../../services/filmeService.js";
 import { useEffect, useState } from "react";
-import { getDiretores } from "../../../services/diretorService.js";
+import { getDiretores } from "../../../../services/diretorService.js";
 
 const AddContainer = styled(CardModel)``;
 
@@ -40,7 +40,6 @@ function AddCard() {
     e.preventDefault()
     try {
       const filme = processaBusca(e)
-      console.log(filme.diretor);
       const data = await insertFilme(filme);
       alert(data.message);
     } catch (error) {
