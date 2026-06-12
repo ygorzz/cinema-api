@@ -1,16 +1,16 @@
 import styled from "styled-components";
-import CardModel from "../CardModel/index.jsx";
+import CardModel from "../../CardModel/index.jsx";
 import {
   Input,
   Form,
   InputSubmit,
   Select,
   Option,
-} from "../../Inputs/index.jsx";
-import Subtitle from "../Subtitle/index.jsx";
-import { updateFilme } from "../../../services/filmeService.js";
+} from "../../../Inputs/index.jsx";
+import Subtitle from "../../Subtitle/index.jsx";
+import { updateFilme } from "../../../../services/filmeService.js";
 import { useEffect, useState } from "react";
-import { getDiretores } from "../../../services/diretorService.js";
+import { getDiretores } from "../../../../services/diretorService.js";
 
 const UpdateContainer = styled(CardModel)``;
 

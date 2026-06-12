@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import CardModel from "../CardModel/index.jsx";
-import { Input, Form, InputSubmit } from "../../Inputs/index.jsx";
-import Subtitle from "../Subtitle/index.jsx";
-import { deleteFilme, getFilmes } from "../../../services/filmeService.js";
+import CardModel from "../../CardModel/index.jsx";
+import { Input, Form, InputSubmit } from "../../../Inputs/index.jsx";
+import Subtitle from "../../Subtitle/index.jsx";
+import { deleteFilme, getFilmes } from "../../../../services/filmeService.js";
 import { useState } from "react";
 import { Trash } from "lucide-react";
 

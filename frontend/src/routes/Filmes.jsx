@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import Cards from "../components/Cards/index.jsx";
+import Cards from "../components/Cards/CardsFilmes/index.jsx";
 
 const FilmesContainer = styled.div`
   width: 100vw;
