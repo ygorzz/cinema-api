@@ -3,20 +3,32 @@ import HeaderOptions from "./HeaderOptions/index.jsx";
 import Logo from "./Logo/index.jsx";
 
 const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  color: #fff;
+  background-image: linear-gradient(
+    135deg,
+    #0a0a0a 0%,
+    #1e0000 45%,
+    #7a1111 75%,
+    #c41a1a 100%
+  );
+  a {
+    color: white;
+    padding: 0 18px;
+    font-size: 26px;
     display: flex;
-    justify-content: center;
-    color: #FFF;
-    background-image: linear-gradient(135deg, #0a0a0a 0%, #1e0000 45%, #7a1111 75%, #c41a1a 100%);
-    
-`
+    align-items: center;
+  }
+`;
 
-function Header(){
-    return (
-        <HeaderContainer>
-            <Logo />
-            <HeaderOptions />
-        </HeaderContainer>
-    )
-} 
+function Header() {
+  return (
+    <HeaderContainer>
+      <Logo />
+      <HeaderOptions />
+    </HeaderContainer>
+  );
+}
 
 export default Header;

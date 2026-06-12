@@ -22,16 +22,38 @@ const InputSubmitElement = styled(InputElement)`
   background-color: #c41a1a;
 `;
 
-export function Form({onSubmit, children }) {
-  return <FormElement onSubmit={onSubmit}>{children}</FormElement>;
+const SelectElement = styled.select`
+  height: 35px;
+  width: 49%;
+  font-size: 20px;
+  border-radius: 9px;
+  background-color: #f0f0f0;
+`;
+
+const OptionElement = styled.option`
+  
+`
+
+export function Form({ children, ...props}) {
+  return <FormElement {...props}>{children}</FormElement>;
 }
 
-export function Input({ placeholder, type, value, name }) {
-  return <InputElement placeholder={placeholder} type={type} value={value} name={name} />;
-}
-
-export function InputSubmit({ placeholder, value }) {
+export function Input({ ...props }) {
   return (
-    <InputSubmitElement placeholder={placeholder} type="submit" value={value} />
+    <InputElement {...props} />
   );
+}
+  
+export function InputSubmit({ ...props }) {
+  return (
+    <InputSubmitElement {...props} type="submit" />
+  );
+}
+
+export function Select({children, ...props}) {
+  return <SelectElement {...props}>{children}</SelectElement>;
+}
+
+export function Option({children, ...props}) {
+  return <OptionElement {...props}>{children}</OptionElement>;
 }

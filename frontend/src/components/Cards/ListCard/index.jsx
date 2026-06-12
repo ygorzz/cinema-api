@@ -2,13 +2,35 @@ import styled from "styled-components";
 import CardModel from "../CardModel/index.jsx";
 import { Input, Form, InputSubmit } from "../../Inputs/index.jsx";
 import Subtitle from "../Subtitle/index.jsx";
-import { getFilmes } from "../../../services/filmeService.js";
+import { deleteFilme, getFilmes } from "../../../services/filmeService.js";
 import { useState } from "react";
+import { Trash } from "lucide-react";
 
 const ListContainer = styled(CardModel)``;
 
+const ResultadoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 const Resultado = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
   color: white;
+  p {
+    font-size: 18px;
+  }
+  button {
+    background: none;
+    height: 20px;
+    cursor: pointer;
+  }
+  cursor: pointer;
+  &:hover {
+    border: 1px solid white;
+  }
 `;
 
 function processaBusca(e) {
@@ -23,22 +45,57 @@ function processaBusca(e) {
 }
 
 function ListCard() {
-  const [resultado, setResultado] = useState([]);
-  const [temRequisicao, setTemrequisicao] = useState(false);
+  const [filmes, setFilmes] = useState([]);
+  const [mensagem, setMensagem] = useState(null);
 
   async function handleGetFilmes(e) {
     e.preventDefault();
-    const filtros = processaBusca(e);
     try {
+      setFilmes([]);
+      setMensagem(null);
+      const filtros = processaBusca(e);
       const data = await getFilmes(filtros);
-      if(data.resultado.length === 0){
-        setResultado(data.message);
-      } else {
-        setResultado(data.resultado)
-      }
-      setTemrequisicao(true);
+      data.result.length === 0
+        ? setMensagem(data.message)
+        : setFilmes(data.result);
     } catch (error) {
-      console.log(error);
+      setMensagem(error.response.data.message);
+    }
+  }
+
+  async function handleDeleteFilme(id) {
+    try {
+      const data = await deleteFilme(id);
+      alert(data.message);
+    } catch (error) {
+      alert(error.response.data.message);
+    }
+  }
+
+  function renderResultado(filmes, mensagem) {
+    if (filmes.length > 0) {
+      return (
+        <ResultadoContainer>
+          {filmes.map((filme) => {
+            return (
+              <Resultado key={filme._id}>
+                <p>{filme.titulo}</p>
+                <button onClick={() => handleDeleteFilme(filme._id)}>
+                  <Trash size={18} color="white" strokeWidth={2} />
+                </button>
+              </Resultado>
+            );
+          })}
+        </ResultadoContainer>
+      );
+    } else if (mensagem) {
+      return (
+        <Resultado>
+          <p>{mensagem}</p>
+        </Resultado>
+      );
+    } else {
+      return null;
     }
   }
 
@@ -51,15 +108,9 @@ function ListCard() {
         <Input placeholder="Diretor" name="diretor" />
         <Input placeholder="Ano de Lançamento" name="anoLancamento" />
         <Input placeholder="Ordenar" name="ordenacao" />
-        <InputSubmit value="Buscar" />
+        <InputSubmit defaultValue="Buscar" />
       </Form>
-      {temRequisicao ? (
-        <Resultado>
-          {resultado.map((filme) => {
-            return <p key={filme.id}>{filme.titulo}</p>;
-          })}
-        </Resultado>
-      ) : null}
+      {renderResultado(filmes, mensagem)}
     </ListContainer>
   );
 }
