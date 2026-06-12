@@ -8,6 +8,7 @@ const Card = styled.div`
   width: 25%;
   box-shadow: 0 4px 16px #2A2A2A;
   background-color: #141414;
+  flex: 1;
 `;
 
 function CardModel({ titulo, children }) {

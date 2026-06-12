@@ -9,6 +9,12 @@ async function getFilmes(filtros){
     return response.data;
 }
 
+async function deleteFilme(id){
+    const response = await filmeAPI.delete(`${id}`);
+    return response.data;
+}
+
 export {
-    getFilmes
+    getFilmes,
+    deleteFilme
 }
