@@ -1,4 +1,3 @@
-import enviaRespostaLista from "../helpers/enviaRespostaLista.js";
 import enviaRespostaObjeto from "../helpers/enviaRespostaObjeto.js";
 import validaLimite from "../helpers/validaLimite.js";
 import validaPagina from "../helpers/validaPagina.js";
@@ -31,7 +30,7 @@ class DiretorController {
           .limit(limite);
       }
 
-      enviaRespostaLista(listaDiretores, res);
+      res.status(200).json({result: listaDiretores});
     } catch (error) {
       next(error);
     };

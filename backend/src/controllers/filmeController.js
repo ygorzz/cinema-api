@@ -1,135 +1,60 @@
-import filme from "../models/Filmes.js";
-import { diretor } from "../models/Diretor.js";
-import Erro404 from "../errors/Erro404.js";
-import ErroValidacao from "../errors/ErroValidacao.js";
-import enviaRespostaLista from "../helpers/enviaRespostaLista.js";
-import enviaRespostaObjeto from "../helpers/enviaRespostaObjeto.js";
-import validaPagina from "../helpers/validaPagina.js";
-import validaLimite from "../helpers/validaLimite.js";
-import escapeRegex from "../helpers/escapeRegex.js";
+import * as FilmeService from "../services/filmeService.js";
 
 class FilmeController {
 
   static async listarFilmes(req, res, next) {
-
+    const {query, paginacao} = req;
     try {
-      const filmeExiste = await filme.exists({});
-      if (!filmeExiste) {
-        return res.status(200).json({ message: "Não há dados cadastrados nessa coleção" });
-      }
-
-      // Verifica se tem filtro ou não na url antes de realizar a busca
-      const busca = processaBusca(req.query);
-      const { pagina, limite, skip, campoOrdenacao, ordem } = req.paginacao;
-
-      validaLimite(limite);
-      const totalDocumentos = await filme.countDocuments(busca);
-      let listaFilmes = [];
-
-      if(totalDocumentos > 0){
-        validaPagina(totalDocumentos, pagina, limite);
-        listaFilmes = await filme.find(busca)
-          .sort({[campoOrdenacao] : ordem})
-          .skip(skip)
-          .limit(limite);
-      }
-
-      enviaRespostaLista(listaFilmes, res);
+      const listaFilmes = await FilmeService.listarFilmes(query, paginacao);
+      res.status(200).json({result: listaFilmes});
     } catch (error) {
       next(error);
     };
   };
 
   static async buscarFilmePorId(req, res, next) {
-
-    const id = req.params.id;
-
+    const { id } = req.params;
     try {
-      const filmeEncontrado = await filme.findById(id);
-      enviaRespostaObjeto(filmeEncontrado, res, "Filme retornado com sucesso");
+      const filmeEncontrado = await FilmeService.buscarFilmePorId(id);
+      res.status(200).json({result: filmeEncontrado});
     } catch (error) {
       next(error);
     };
   };
 
   static async cadastrarFilme(req, res, next) {
-
     const dadosFilme = req.body;
-    const tituloFilme = req.body.titulo;
-    const idDiretor = req.body.diretor;
-    
-    // Verificação antecipada para evitar consulta desnecessária no BD
-    if (!tituloFilme || !idDiretor) {
-      return next(new ErroValidacao("Titulo e diretor do filme são obrigatórios"));
-    }
-    
     try {
-      const diretorBuscado = await diretor.findById(idDiretor); // Busca o diretor correspondente ao id
-      if (!diretorBuscado) {
-        return next(new Erro404("Não foi encontrado diretor correspondente a esse ID."));
-      }
-      console.log("ola");
-      const filmeCompleto = { ...dadosFilme, diretor: diretorBuscado }; // Constrói o objeto final
-      const filmeCadastrado = await filme.create(filmeCompleto);
-      enviaRespostaObjeto(filmeCadastrado, res, "Filme cadastrrado com sucesso");
-
+      const filmeCadastrado = await FilmeService.cadastrarFilme(dadosFilme);
+      res.status(201).json({message: "Filme cadastrado com sucesso", result: filmeCadastrado});
     } catch (error) {
       next(error);
-    };
+    }
   };
 
   static async atualizarFilme(req, res, next) {
-
     const id = req.params.id;
     const atualizacao = req.body;
-    const idDiretor = atualizacao.diretor;
-
     try {
-      if (idDiretor) {
-        const diretorBuscado = await diretor.findById(idDiretor);
-        if (!diretorBuscado) {
-          return next(new Erro404("Não foi encontrado diretor correspondente a esse ID."));
-        }
-        atualizacao.diretor = diretorBuscado;
-      }
+      const filmeAtualizado = await FilmeService.atualizarFilme(id, atualizacao);
 
-      const filmeAtualizado = await filme.findByIdAndUpdate(id, atualizacao, { returnDocument: "after" });
-      enviaRespostaObjeto(filmeAtualizado, res, "Filme atualizado com sucesso");
+      res.status(200).json({message: "Filme atualizado com sucesso", result: filmeAtualizado});
     } catch (error) {
       next(error);
-    };
+    }
+
   };
 
   static async removerFilme(req, res, next) {
 
     const id = req.params.id;
-
     try {
-      const filmeRemovido = await filme.findByIdAndDelete(id);
-      enviaRespostaObjeto(filmeRemovido, res, "Filme removido com sucesso");
+      const filmeRemovido = await FilmeService.removerFilme(id);
+      res.status(200).json({message: "Filme removido com sucesso", result: filmeRemovido});
     } catch (error) {
       next(error);
-    };
+    }
   };
 };
-
-function processaBusca(busca) {
-
-  const { genero, anoLancamento, titulo, diretor } = busca;
-  const filtros = {};
-  
-  if (genero) filtros.genero = genero;
-  if (anoLancamento) filtros.anoLancamento = parseInt(anoLancamento);
-  if (titulo){
-    const tituloLimpo = escapeRegex(titulo); // Evita regex injections
-    filtros.titulo = { $regex: tituloLimpo, $options: "i" };
-  } 
-  if (diretor){
-    const diretorLimpo = escapeRegex(diretor); // Evita regex injections
-    filtros["diretor.nome"] = { $regex: diretorLimpo, $options: "i" }; 
-  }
-
-  return filtros;
-}
 
 export default FilmeController;
