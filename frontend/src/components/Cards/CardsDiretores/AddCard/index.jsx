@@ -1,8 +1,12 @@
 import styled from "styled-components";
 import CardModel from "../../CardModel/index.jsx";
-import { Input, Form, InputSubmit } from "../../../Inputs/index.jsx";
+import { Input, Form, Button } from "../../../Inputs/index.jsx";
 import Subtitle from "../../Subtitle/index.jsx";
-import { insertDiretor } from "../../../../services/diretorService.js";
+import {
+  insertDiretor,
+  updateDiretor,
+} from "../../../../services/diretorService.js";
+import { useEffect, useState } from "react";
 
 const AddContainer = styled(CardModel)``;
 
@@ -10,15 +14,36 @@ function processaBusca(e) {
   const diretor = {};
   const form = e.target;
   for (const input of form) {
-    if (input.value !== "") {
+    if (input.name) {
       diretor[input.name] = input.value;
     }
   }
   return diretor;
 }
 
-function AddCard() {
-    
+function AddCard({ diretorToUpdate, setDiretorToUpdate }) {
+  const [campos, setCampos] = useState({
+    nome: "",
+    nacionalidade: "",
+  });
+
+  useEffect(() => {
+    function buildFields() {
+      if (diretorToUpdate) {
+        setCampos({
+          nome: diretorToUpdate.nome ?? "",
+          nacionalidade: diretorToUpdate.nacionalidade ?? "",
+        });
+      } else {
+        setCampos({
+          nome: "",
+          nacionalidade: ""
+        })
+      }
+    }
+    buildFields();
+  }, [diretorToUpdate]);
+
   async function handleInsertDiretor(e) {
     e.preventDefault();
     try {
@@ -31,13 +56,47 @@ function AddCard() {
     }
   }
 
+  async function handleUpdateDiretor(e) {
+    e.preventDefault();
+    try {
+      const diretor = processaBusca(e);
+      diretor._id = diretorToUpdate._id;
+      const data = await updateDiretor(diretor);
+      alert(data.message);
+      setDiretorToUpdate(null);
+    } catch (error) {
+      alert(error.response.data.message);
+    }
+  }
+
   return (
     <AddContainer titulo="Adicionar Diretor">
       <Subtitle subtitle="Dados" />
-      <Form onSubmit={handleInsertDiretor}>
-        <Input placeholder="Nome" name="nome" required />
-        <Input placeholder="Nacionalidade" name="nacionalidade" />
-        <InputSubmit defaultValue="Adicionar" />
+      <Form
+        onSubmit={diretorToUpdate ? handleUpdateDiretor : handleInsertDiretor}
+      >
+        <Input
+          placeholder="Nome"
+          name="nome"
+          required
+          value={campos.nome}
+          onChange={(e) => setCampos({ ...campos, nome: e.target.value })}
+        />
+        <Input
+          placeholder="Nacionalidade"
+          name="nacionalidade"
+          value={campos.nacionalidade}
+          onChange={(e) =>
+            setCampos({ ...campos, nacionalidade: e.target.value })
+          }
+        />
+
+        {diretorToUpdate && (
+          <Button onClick={() => setDiretorToUpdate(null)} type="button" >Cancelar</Button>
+        )}
+        <Button type="submit" color="#c41a1a">
+          {diretorToUpdate ? "Salvar Alterações" : "Adicionar"}
+        </Button>
       </Form>
     </AddContainer>
   );

@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import CardModel from "../../CardModel/index.jsx";
-import { Input, Form, InputSubmit } from "../../../Inputs/index.jsx";
+import { Input, Form, Button } from "../../../Inputs/index.jsx";
 import Subtitle from "../../Subtitle/index.jsx";
 import { deleteFilme, getFilmes } from "../../../../services/filmeService.js";
 import { useState } from "react";
-import { Trash } from "lucide-react";
+import { Trash, Edit2 } from "lucide-react";
 
 const ListContainer = styled(CardModel)``;
 
@@ -44,7 +44,7 @@ function processaBusca(e) {
   return filtros;
 }
 
-function ListCard() {
+function ListCard({setFilmeToUpdate}) {
   const [filmes, setFilmes] = useState([]);
   const [mensagem, setMensagem] = useState(null);
 
@@ -83,6 +83,9 @@ function ListCard() {
                 <button onClick={() => handleDeleteFilme(filme._id)}>
                   <Trash size={18} color="white" strokeWidth={2} />
                 </button>
+                <button onClick={() => setFilmeToUpdate(filme)}>
+                  <Edit2 size={18} color="white" strokeWidth={2} />
+                </button>
               </Resultado>
             );
           })}
@@ -108,7 +111,7 @@ function ListCard() {
         <Input placeholder="Diretor" name="diretor" />
         <Input placeholder="Ano de Lançamento" name="anoLancamento" />
         <Input placeholder="Ordenar" name="ordenacao" />
-        <InputSubmit defaultValue="Buscar" />
+        <Button type="submit" color="#c41a1a">Buscar</Button>
       </Form>
       {renderResultado(filmes, mensagem)}
     </ListContainer>

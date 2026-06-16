@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import ListCard from "./ListCard/index.jsx";
 import AddCard from "./AddCard/index.jsx";
-import UpdateCard from "./UpdateCard/index.jsx";
+import { useState } from "react";
 
 const CardsContainer = styled.div`
   display: flex;
@@ -11,11 +11,12 @@ const CardsContainer = styled.div`
 `;
 
 function CardsFilmes() {
+  const [filmeToUpdate, setFilmeToUpdate] = useState(null);
+  
   return (
     <CardsContainer>
-      <ListCard />
-      <AddCard />
-      <UpdateCard />
+      <ListCard setFilmeToUpdate={setFilmeToUpdate} />
+      <AddCard filmeToUpdate={filmeToUpdate} setFilmeToUpdate={setFilmeToUpdate} />
     </CardsContainer>
   );
 }

@@ -20,8 +20,14 @@ async function insertDiretor(diretor) {
     return response.data;
 }
 
+async function updateDiretor({_id, ...atualizacao}){
+    const response = await diretorAPI.put(`${_id}`, atualizacao);
+    return response.data;
+}
+
 export {
     getDiretores,
     deleteDiretor,
-    insertDiretor
+    insertDiretor,
+    updateDiretor
 }

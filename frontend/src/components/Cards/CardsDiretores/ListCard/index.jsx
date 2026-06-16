@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import CardModel from "../../CardModel/index.jsx";
-import { Input, Form, InputSubmit } from "../../../Inputs/index.jsx";
+import { Input, Form, Button } from "../../../Inputs/index.jsx";
 import Subtitle from "../../Subtitle/index.jsx";
 import { useState } from "react";
-import { Trash } from "lucide-react";
+import { Edit2, Trash } from "lucide-react";
 import { deleteDiretor, getDiretores } from "../../../../services/diretorService.js";
 
 const ListContainer = styled(CardModel)``;
@@ -44,7 +44,7 @@ function processaBusca(e) {
   return filtros;
 }
 
-function ListCard() {
+function ListCard({setDiretorToUpdate}) {
   const [diretores, setDiretores] = useState([]);
   const [mensagem, setMensagem] = useState(null);
 
@@ -84,6 +84,9 @@ function ListCard() {
                 <button onClick={() => handleDeleteDiretor(diretor._id)}>
                   <Trash size={18} color="white" strokeWidth={2} />
                 </button>
+                <button onClick={() => setDiretorToUpdate(diretor)}>
+                  <Edit2 size={18} color="white" strokeWidth={2} />
+                </button>
               </Resultado>
             );
           })}
@@ -107,7 +110,7 @@ function ListCard() {
         <Input placeholder="Nome" name="nome" />
         <Input placeholder="Nacionalidade" name="nacionalidade" />
         <Input placeholder="Ordenar" name="ordenacao" />
-        <InputSubmit defaultValue="Buscar" />
+        <Button type="submit" color="#c41a1a" >Buscar</Button>
       </Form>
       {renderResultado(diretores, mensagem)}
     </ListContainer>

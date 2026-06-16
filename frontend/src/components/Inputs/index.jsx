@@ -14,12 +14,14 @@ const InputElement = styled.input`
   background-color: #f0f0f0;
 `;
 
-const InputSubmitElement = styled(InputElement)`
+const ButtonElement = styled.button`
   height: 40px;
   width: 100%;
   margin: 20px 0px;
   cursor: pointer;
-  background-color: #c41a1a;
+  background-color: ${props => props.color || "white" };
+  font-size: 20px;
+  border-radius: 9px;
 `;
 
 const SelectElement = styled.select`
@@ -44,9 +46,9 @@ export function Input({ ...props }) {
   );
 }
   
-export function InputSubmit({ ...props }) {
+export function Button({ ...props }) {
   return (
-    <InputSubmitElement {...props} type="submit" />
+    <ButtonElement {...props} />
   );
 }
 

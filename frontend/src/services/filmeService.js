@@ -19,9 +19,9 @@ async function insertFilme(filme){
     return response.data;
 }
 
-async function updateFilme({id, ...atualizacao}){
-    const response = await filmeAPI.patch(`${id}`, atualizacao)
-    return response;
+async function updateFilme({_id, ...atualizacao}){
+    const response = await filmeAPI.put(`${_id}`, atualizacao)
+    return response.data;
 }
 
 export {
