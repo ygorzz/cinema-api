@@ -19,7 +19,7 @@ function processaBusca(e) {
   return filme;
 }
 
-function AddCard({ filmeToUpdate, setFilmeToUpdate }) {
+function AddCard({ filmeToUpdate, setFilmeToUpdate, setReloadFilmes }) {
   const [diretores, setDiretores] = useState([]);
   const [campos, setCampos] = useState({
     titulo: "",
@@ -57,7 +57,6 @@ function AddCard({ filmeToUpdate, setFilmeToUpdate }) {
     async function fetchDiretores() {
       try {
         const data = await getDiretores();
-        console.log(data);
         setDiretores(data.result || []);
       } catch (error) {
         console.log(error);
@@ -84,10 +83,10 @@ function AddCard({ filmeToUpdate, setFilmeToUpdate }) {
     try {
       const filme = processaBusca(e);
       filme._id = filmeToUpdate._id;
-      console.log(filme);
       const data = await updateFilme(filme);
-      alert(data.message);
+      setReloadFilmes(true);
       setFilmeToUpdate(null);
+      alert(data.message);
     } catch (error) {
       alert(error.response.data.message);
     }

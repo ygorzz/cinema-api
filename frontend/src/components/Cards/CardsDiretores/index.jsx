@@ -12,11 +12,12 @@ const CardsContainer = styled.div`
 
 function CardsDiretores() {
   const [diretorToUpdate, setDiretorToUpdate] = useState(null);
+  const [reloadDiretores, setReloadDiretores] = useState(false);
 
   return (
     <CardsContainer>
-      <ListCard setDiretorToUpdate={setDiretorToUpdate} />
-      <AddCard  diretorToUpdate={diretorToUpdate} setDiretorToUpdate={setDiretorToUpdate}/>
+      <ListCard setDiretorToUpdate={setDiretorToUpdate} reloadDiretores={reloadDiretores} setReloadDiretores={setReloadDiretores} />
+      <AddCard  diretorToUpdate={diretorToUpdate} setDiretorToUpdate={setDiretorToUpdate} setReloadDiretores={setReloadDiretores} />
     </CardsContainer>
   );
 }

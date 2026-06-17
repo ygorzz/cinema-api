@@ -5,6 +5,7 @@ import Subtitle from "../../Subtitle/index.jsx";
 import { deleteFilme, getFilmes } from "../../../../services/filmeService.js";
 import { useState } from "react";
 import { Trash, Edit2 } from "lucide-react";
+import { useEffect } from "react";
 
 const ListContainer = styled(CardModel)``;
 
@@ -44,15 +45,26 @@ function processaBusca(e) {
   return filtros;
 }
 
-function ListCard({setFilmeToUpdate}) {
+function ListCard({setFilmeToUpdate, reloadFilmes, setReloadFilmes}) {
   const [filmes, setFilmes] = useState([]);
   const [mensagem, setMensagem] = useState(null);
 
+  // Emm caso de update em um filme, limpa a listade filmes que estava sendo exibida
+  useEffect(() => {
+    if(!reloadFilmes) return;
+    function updateFetchFilmes(){
+      setFilmes([]);
+      setReloadFilmes(false);
+    }
+    updateFetchFilmes();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reloadFilmes])
+
   async function handleGetFilmes(e) {
     e.preventDefault();
+    setFilmes([]);
+    setMensagem(null);
     try {
-      setFilmes([]);
-      setMensagem(null);
       const filtros = processaBusca(e);
       const data = await getFilmes(filtros);
       data.result.length === 0

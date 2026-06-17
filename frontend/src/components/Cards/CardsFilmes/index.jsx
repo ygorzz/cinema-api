@@ -12,11 +12,12 @@ const CardsContainer = styled.div`
 
 function CardsFilmes() {
   const [filmeToUpdate, setFilmeToUpdate] = useState(null);
+  const [reloadFilmes, setReloadFilmes] = useState(false);
   
   return (
     <CardsContainer>
-      <ListCard setFilmeToUpdate={setFilmeToUpdate} />
-      <AddCard filmeToUpdate={filmeToUpdate} setFilmeToUpdate={setFilmeToUpdate} />
+      <ListCard setFilmeToUpdate={setFilmeToUpdate} reloadFilmes={reloadFilmes} setReloadFilmes={setReloadFilmes} />
+      <AddCard filmeToUpdate={filmeToUpdate} setFilmeToUpdate={setFilmeToUpdate} setReloadFilmes={setReloadFilmes} />
     </CardsContainer>
   );
 }

@@ -5,6 +5,7 @@ import Subtitle from "../../Subtitle/index.jsx";
 import { useState } from "react";
 import { Edit2, Trash } from "lucide-react";
 import { deleteDiretor, getDiretores } from "../../../../services/diretorService.js";
+import { useEffect } from "react";
 
 const ListContainer = styled(CardModel)``;
 
@@ -44,9 +45,19 @@ function processaBusca(e) {
   return filtros;
 }
 
-function ListCard({setDiretorToUpdate}) {
+function ListCard({setDiretorToUpdate, reloadDiretores, setReloadDiretores}) {
   const [diretores, setDiretores] = useState([]);
   const [mensagem, setMensagem] = useState(null);
+
+  useEffect(() => {
+    if(!reloadDiretores) return;
+    function updateFetchDiretores(){
+      setDiretores([]);
+      setReloadDiretores(false);
+    }
+    updateFetchDiretores();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reloadDiretores])
 
   async function handleGetDiretores(e) {
     e.preventDefault();

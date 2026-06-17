@@ -21,7 +21,7 @@ function processaBusca(e) {
   return diretor;
 }
 
-function AddCard({ diretorToUpdate, setDiretorToUpdate }) {
+function AddCard({ diretorToUpdate, setDiretorToUpdate, setReloadDiretores }) {
   const [campos, setCampos] = useState({
     nome: "",
     nacionalidade: "",
@@ -62,8 +62,9 @@ function AddCard({ diretorToUpdate, setDiretorToUpdate }) {
       const diretor = processaBusca(e);
       diretor._id = diretorToUpdate._id;
       const data = await updateDiretor(diretor);
-      alert(data.message);
+      setReloadDiretores(true);
       setDiretorToUpdate(null);
+      alert(data.message);
     } catch (error) {
       alert(error.response.data.message);
     }
