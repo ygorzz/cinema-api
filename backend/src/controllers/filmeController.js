@@ -33,11 +33,10 @@ class FilmeController {
   };
 
   static async atualizarFilme(req, res, next) {
-    const id = req.params.id;
+    const { id } = req.params;
     const atualizacao = req.body;
     try {
       const filmeAtualizado = await FilmeService.atualizarFilme(id, atualizacao);
-
       res.status(200).json({message: "Filme atualizado com sucesso", result: filmeAtualizado});
     } catch (error) {
       next(error);
@@ -47,7 +46,7 @@ class FilmeController {
 
   static async removerFilme(req, res, next) {
 
-    const id = req.params.id;
+    const { id } = req.params;
     try {
       const filmeRemovido = await FilmeService.removerFilme(id);
       res.status(200).json({message: "Filme removido com sucesso", result: filmeRemovido});

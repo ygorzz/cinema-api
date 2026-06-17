@@ -1,35 +1,11 @@
-import enviaRespostaObjeto from "../helpers/enviaRespostaObjeto.js";
-import validaLimite from "../helpers/validaLimite.js";
-import validaPagina from "../helpers/validaPagina.js";
-import { diretor } from "../models/Diretor.js";
+import * as DiretorService from "../services/diretorService.js";
 
 class DiretorController {
 
   static async listarDiretores(req, res, next) {
-
+    const {query, paginacao} = req;
     try {
-
-      const diretorExiste = await diretor.exists({});
-      if (!diretorExiste) {
-        return res.status(200).json({ message: "Não há dados cadastrados nessa coleção" });
-      }
-
-      // Verifica se tem filtro ou não na url antes de realizar a busca
-      const busca = processaBusca(req.query);
-      const { pagina, limite, skip, campoOrdenacao, ordem } = req.paginacao;
-
-      validaLimite(limite);
-      const totalDocumentos = await diretor.countDocuments(busca); // para validar a página
-      let listaDiretores = [];
-
-      if(totalDocumentos > 0){
-        validaPagina(totalDocumentos, pagina, limite);
-        listaDiretores = await diretor.find(busca)
-          .sort({[campoOrdenacao] : ordem})
-          .skip(skip)
-          .limit(limite);
-      }
-
+      const listaDiretores = await DiretorService.listarDiretores(query, paginacao);
       res.status(200).json({result: listaDiretores});
     } catch (error) {
       next(error);
@@ -37,63 +13,46 @@ class DiretorController {
   };
 
   static async buscarDiretorPorId(req, res, next) {
-
-    const id = req.params.id;
-
+    const { id } = req.params;
     try {
-      const diretorEncontrado = await diretor.findById(id);
-      enviaRespostaObjeto(diretorEncontrado, res, "Diretor retornado com sucesso");
+      const diretorEncontrado = await DiretorService.buscarDiretorPorId(id);
+      res.status(200).json({result: diretorEncontrado});
     } catch (error) {
       next(error);
     };
   };
 
   static async cadastrarDiretor(req, res, next) {
-
+    const dadosDiretor = req.body;
     try {
-      // create -> valida campos required antes de executar a operação no BD
-      const diretorCadastrado = await diretor.create(req.body);
-      enviaRespostaObjeto(diretorCadastrado, res, "Diretor cadastrado com sucesso");
+      const diretorCadastrado = await DiretorService.cadastrarDiretor(dadosDiretor);
+      res.status(201).json({message: "Diretor cadastrado com sucesso", result: diretorCadastrado});
     } catch (error) {
       next(error);
     };
   };
 
   static async atualizarDiretor(req, res, next) {
-
-    const id = req.params.id;
+    const { id } = req.params;
     const atualizacao = req.body;
-
     try {
-      const diretorAtualizado = await diretor.findByIdAndUpdate(id, atualizacao, { returnDocument: "after" });
-      enviaRespostaObjeto(diretorAtualizado, res, "Diretor atualizado com sucesso");
+      const diretorAtualizado = await DiretorService.atualizarDiretor(id, atualizacao);
+      res.status(200).json({message: "Diretor atualizado com sucesso", result: diretorAtualizado});
     } catch (error) {
       next(error);
     };
   };
 
   static async removerDiretor(req, res, next) {
-    
+    const { id } = req.params;
     try {
-      const id = req.params.id;
-      const diretorRemovido = await diretor.findByIdAndDelete(id);
-      enviaRespostaObjeto(diretorRemovido, res, "Diretor removido com sucesso");
+      const diretorRemovido = await DiretorService.removerDiretor(id);
+      res.status(200).json({message: "Diretor removido com sucesso", result: diretorRemovido});
     } catch (error) {
       next(error);
     };
   };
 
 };
-
-function processaBusca(busca) {
-
-  const { nome, nacionalidade } = busca;
-  const filtros = {};
-
-  if (nome) filtros.nome = { $regex: nome, $options: "i" };
-  if (nacionalidade) filtros.nacionalidade = { $regex: nacionalidade, $options: "i" };
-
-  return filtros;
-}
 
 export default DiretorController;

@@ -9,28 +9,23 @@ import ErroValidacao from "../errors/ErroValidacao.js";
 
 async function listarFilmes(query, paginacao){
 
-  let listaFilmes = [];
-
-  if(!(await FilmeRepositoy.exists())){
-    return [];
-  }
-
   const busca = processaBusca(query);
   const { pagina, limite, skip, campoOrdenacao, ordem } = paginacao;
   validaLimite(limite);
-  const totalDocumentos = await FilmeRepositoy.countDocuments(busca);
-  if(totalDocumentos > 0){
-    validaPagina(totalDocumentos, pagina, limite);
-    listaFilmes = await FilmeRepositoy.find(busca, {limite, skip, campoOrdenacao, ordem});
+  const totalDocumentos = await FilmeRepositoy.contarDocumentos(busca);
+  if(totalDocumentos === 0){
+    return [];
   }
+  validaPagina(totalDocumentos, pagina, limite);
+  const listaFilmes = await FilmeRepositoy.listarFilmes(busca, {limite, skip, campoOrdenacao, ordem});
 
   return listaFilmes;
 }
 
 async function buscarFilmePorId(id) {
-  const filmeEncontrado = await FilmeRepositoy.findById(id);
+  const filmeEncontrado = await FilmeRepositoy.buscarFilmePorId(id);
   if(!filmeEncontrado){
-    throw new Erro404("Não foi encontrado dado correspondente a esse id.");
+    throw new Erro404("Não foi encontrado filme correspondente a esse id.");
   }
 
   return filmeEncontrado;
@@ -45,13 +40,13 @@ async function cadastrarFilme(filme){
     throw new ErroValidacao("Titulo e diretor do filme são obrigatórios");
   }
 
-  const diretorBuscado = await DiretorRepository.findById(idDiretor); // Busca o diretor correspondente ao id
+  const diretorBuscado = await DiretorRepository.buscarDiretorPorId(idDiretor); // Busca o diretor correspondente ao id
   if (!diretorBuscado) {
     throw new Erro404("Não foi encontrado diretor correspondente a esse ID.");
   }
 
   const filmeCompleto = { ...filme, diretor: diretorBuscado }; // Constrói o objeto final
-  const filmeCadastrado = await FilmeRepositoy.create(filmeCompleto);
+  const filmeCadastrado = await FilmeRepositoy.cadastrarFilme(filmeCompleto);
 
   return filmeCadastrado;
 }
@@ -60,20 +55,30 @@ async function atualizarFilme(id, atualizacao) {
   const idDiretor = atualizacao.diretor;
 
   if (idDiretor) {
-    const diretorBuscado = await DiretorRepository.findById(idDiretor);
+    // Verifico a existência do diretor antes da do filme para diminuir o número de consultas
+    const diretorBuscado = await DiretorRepository.buscarDiretorPorId(idDiretor);
     if (!diretorBuscado) {
       throw new Erro404("Não foi encontrado diretor correspondente a esse ID.");
     }
     atualizacao.diretor = diretorBuscado;
   }
 
-  const filmeAtualizado = await FilmeRepositoy.findByIdAndUpdate(id, atualizacao);
+  const filmeAtualizado = await FilmeRepositoy.atualizarFilmePorId(id, atualizacao);
+  if(!filmeAtualizado){
+    throw new Erro404("Não foi encontrado filme correspondente a esse ID.");
+  }
 
   return filmeAtualizado;
 }
 
 async function removerFilme(id) {
-  return await FilmeRepositoy.findByIdAndDelete(id);
+  const filmeRemovido = await FilmeRepositoy.removerFilmePorId(id);
+  if(!filmeRemovido){
+    throw new Erro404("Não foi encontrado filme correspondente a esse ID.");
+
+  }
+
+  return filmeRemovido;
 }
 
 function processaBusca(busca) {
@@ -94,7 +99,6 @@ function processaBusca(busca) {
 
   return filtros;
 }
-
 
 export {
   listarFilmes,
