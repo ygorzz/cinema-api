@@ -11,42 +11,28 @@ import {
 import { useEffect } from "react";
 import { Resultado, ResultadoContainer } from "../../../Resultado/index.jsx";
 import { IconesPaginacao } from "../../../IconesPaginacao/index.jsx";
+import { mapInputs } from "../../../../helpers/mapInputs.js";
 
 const ListContainer = styled(CardModel)``;
-
-function processaBusca(e) {
-  const filtros = {};
-  const form = e.target;
-  for (const input of form) {
-    if (input.name && input.value !== "") {
-      filtros[input.name] = input.value;
-    }
-  }
-  return filtros;
-}
 
 function ListCard({ setDiretorToUpdate, reloadDiretores, setReloadDiretores }) {
   const [diretores, setDiretores] = useState([]);
   const [mensagem, setMensagem] = useState(null);
-    const [filtrosAtuais, setFiltrosAtuais] = useState({});
+  const [filtrosAtuais, setFiltrosAtuais] = useState({});
   const [paginaAtual, setPaginaAtual] = useState(1);
 
   useEffect(() => {
     if (!reloadDiretores) return;
-    function updateFetchDiretores() {
-      setDiretores([]);
-      setReloadDiretores(false);
-    }
-    updateFetchDiretores();
-     
+    buscarDiretores(filtrosAtuais, paginaAtual);
+    setReloadDiretores(false);
   }, [reloadDiretores]);
 
   async function handleGetDiretores(e) {
     e.preventDefault();
-    setDiretores([]);
-    setMensagem(null);
+    if (diretores.length > 0) setDiretores([]);
+    if (mensagem) setMensagem(null);
     try {
-      const filtros = processaBusca(e);
+      const filtros = mapInputs(e);
       setFiltrosAtuais(filtros);
       buscarDiretores(filtros, 1);
     } catch (error) {
@@ -54,26 +40,26 @@ function ListCard({ setDiretorToUpdate, reloadDiretores, setReloadDiretores }) {
     }
   }
 
-    async function buscarDiretores(filtros, pagina) {
-      setDiretores([])
+  async function buscarDiretores(filtros, pagina) {
+    const params = {
+      ...filtros,
+      pagina,
+    };
+    try {
+      const data = await getDiretores(params);
       setPaginaAtual(pagina);
-      const params = {
-        ...filtros,
-        pagina,
-      };
-      try {
-        const data = await getDiretores(params);
-        data.result.length === 0 && Object.keys(params).length === 0
-          ? setMensagem("Não há diretores cadastrados") //
-          : setDiretores(data.result);
-      } catch (error) {
-        setMensagem(error.response.data.message);
-      }
+      data.result.length === 0 && Object.keys(params).length === 0
+        ? setMensagem("Não há diretores cadastrados") //
+        : setDiretores(data.result);
+    } catch (error) {
+      alert(error.response.data.message);
     }
+  }
 
   async function handleDeleteDiretor(id) {
     try {
       const data = await deleteDiretor(id);
+      buscarDiretores(filtrosAtuais, paginaAtual);
       alert(data.message);
     } catch (error) {
       console.log(error);

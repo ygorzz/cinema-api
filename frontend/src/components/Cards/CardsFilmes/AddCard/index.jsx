@@ -1,84 +1,88 @@
 import styled from "styled-components";
 import CardModel from "../../CardModel/index.jsx";
-import { Input, Form, Button, Select, Option } from "../../../Inputs/index.jsx";
+import { Input, Form, Button } from "../../../Inputs/index.jsx";
 import Subtitle from "../../CardSubtitle/index.jsx";
 import { insertFilme, updateFilme } from "../../../../services/filmeService.js";
 import { useEffect, useState } from "react";
 import { getDiretores } from "../../../../services/diretorService.js";
+import { mapInputs } from "../../../../helpers/mapInputs.js";
+import { Resultado, ResultadoContainer } from "../../../Resultado/index.jsx";
+import { handleChange } from "../../../../helpers/handleChange.js";
 
-const AddContainer = styled(CardModel)``;
+const AddContainer = styled(CardModel)`
 
-function processaBusca(e) {
-  const filme = {};
-  const form = e.target;
-  for (const input of form) {
-    if (input.name) {
-      filme[input.name] = input.value;
-    }
-  }
-  return filme;
-}
+`;
+
+const CAMPOS_INICIAIS = {
+  titulo: "",
+  genero: "",
+  anoLancamento: "",
+  duracaoMinutos: "",
+  diretor: "",
+};
 
 function AddCard({ filmeToUpdate, setFilmeToUpdate, setReloadFilmes }) {
   const [diretores, setDiretores] = useState([]);
-  const [campos, setCampos] = useState({
-    titulo: "",
-    genero: "",
-    anoLancamento: "",
-    duracaoMinutos: "",
-    diretor: "",
-  });
+  const [nomeDiretor, setNomeDiretor] = useState("");
+  const [diretorSelecionado, setDiretorSelecionado] = useState(false);
+  const [campos, setCampos] = useState(CAMPOS_INICIAIS);
 
   // Quando filmeToUpdate mudar, preenche os campos
   useEffect(() => {
-    function buildFields() {
+    function buildFields(){
+      setDiretorSelecionado(true)
       if (filmeToUpdate) {
         setCampos({
           titulo: filmeToUpdate.titulo ?? "",
           genero: filmeToUpdate.genero ?? "",
           anoLancamento: filmeToUpdate.anoLancamento ?? "",
           duracaoMinutos: filmeToUpdate.duracaoMinutos ?? "",
-          diretor: filmeToUpdate.diretor?._id ?? filmeToUpdate.diretor ?? "",
+          diretor: filmeToUpdate.diretor?._id ?? "",
         });
+  
+        setNomeDiretor(filmeToUpdate.diretor?.nome ?? "");
       } else {
-        setCampos({
-          titulo: "",
-          genero: "",
-          anoLancamento: "",
-          duracaoMinutos: "",
-          diretor: "",
-        });
+        setCampos(CAMPOS_INICIAIS);
+  
+        setNomeDiretor("");
       }
     }
+
     buildFields();
   }, [filmeToUpdate]);
 
   useEffect(() => {
     async function fetchDiretores() {
+      if (!nomeDiretor || diretorSelecionado) {
+        setDiretores([]);
+        return;
+      }
+      const filtro = {
+        nome: nomeDiretor,
+      };
       try {
-        const data = await getDiretores();
+        const data = await getDiretores(filtro);
         setDiretores(data.result || []);
       } catch (error) {
         console.log(error);
         alert("Erro ao carregar diretores. Tente novamente");
       }
     }
+    // Debounce -> espera o usuário parar de executar uma ação por X tempo antes de fazer alguma coisa
+    // setTimeout -> retorna um id
+    const timeout = setTimeout(fetchDiretores, 300);
 
-    fetchDiretores();
-  }, []);
+    // O useEffect executa o return antes da função chamada dentro dele.
+    return () => clearTimeout(timeout);
+  }, [nomeDiretor]);
 
   async function handleInsertFilme(e) {
     e.preventDefault();
+    setNomeDiretor("");
     try {
-      const filme = processaBusca(e);
+      const filme = mapInputs(e);
       const data = await insertFilme(filme);
-      setCampos({
-          titulo: "",
-          genero: "",
-          anoLancamento: "",
-          duracaoMinutos: "",
-          diretor: "",
-        });
+      setCampos(CAMPOS_INICIAIS);
       alert(data.message);
     } catch (error) {
       alert(error.response.data.message);
@@ -88,7 +92,7 @@ function AddCard({ filmeToUpdate, setFilmeToUpdate, setReloadFilmes }) {
   async function handleUpdateFilme(e) {
     e.preventDefault();
     try {
-      const filme = processaBusca(e);
+      const filme = mapInputs(e);
       filme._id = filmeToUpdate._id;
       const data = await updateFilme(filme);
       setReloadFilmes(true);
@@ -110,13 +114,13 @@ function AddCard({ filmeToUpdate, setFilmeToUpdate, setReloadFilmes }) {
           name="titulo"
           required
           value={campos.titulo}
-          onChange={(e) => setCampos({ ...campos, titulo: e.target.value })}
+          onChange={(e) => handleChange(e, setCampos)}
         />
         <Input
           placeholder="Gênero"
           name="genero"
           value={campos.genero}
-          onChange={(e) => setCampos({ ...campos, genero: e.target.value })}
+          onChange={(e) => handleChange(e, setCampos)}
         />
         <Input
           placeholder="Ano de Lançamento"
@@ -134,25 +138,43 @@ function AddCard({ filmeToUpdate, setFilmeToUpdate, setReloadFilmes }) {
             setCampos({ ...campos, duracaoMinutos: e.target.value })
           }
         />
-        <Select
-          name="diretor"
-          required
-          value={campos.diretor}
-          onChange={(e) => setCampos({ ...campos, diretor: e.target.value })}
-        >
-          <Option value="" disabled>
-            Diretor
-          </Option>
-          {diretores.length !== 0 &&
-            diretores.map((diretor) => (
-              <Option key={diretor._id} value={diretor._id}>
-                {diretor.nome}
-              </Option>
-            ))}
-        </Select>
+        <Input type="hidden" name="diretor" value={campos.diretor} />
+        <Input
+          placeholder="Digite o nome do diretor"
+          value={nomeDiretor}
+          onChange={(e) => {
+            setNomeDiretor(e.target.value);
+            handleChange(e, setCampos);
+            setDiretorSelecionado(false);
+          }}
+        />
+
+        {diretores.length > 0 && (
+          <ResultadoContainer>
+            {diretores.map((diretor) => {
+              return (
+                <Resultado
+                  onClick={() => {
+                    setCampos(prev => ({
+                       ...prev,
+                      diretor: diretor._id 
+                    }));
+                    setNomeDiretor(diretor.nome);
+                    setDiretorSelecionado(true);
+                  }}
+                  key={diretor._id}
+                >
+                  <p>{diretor.nome}</p>
+                </Resultado>
+              );
+            })}
+          </ResultadoContainer>
+        )}
 
         {filmeToUpdate && (
-          <Button onClick={() => setFilmeToUpdate(null)} type="button">Cancelar</Button>
+          <Button onClick={() => setFilmeToUpdate(null)} type="button" textColor="#000">
+            Cancelar
+          </Button>
         )}
         <Button type="submit" color="#c41a1a">
           {filmeToUpdate ? "Salvar Alterações" : "Adicionar"}

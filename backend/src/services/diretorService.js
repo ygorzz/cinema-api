@@ -16,7 +16,6 @@ async function listarDiretores(query, paginacao){
   }
   validaPagina(totalDocumentos, pagina, limite);
   const listaDiretores = await DiretorRepository.listarDiretores(busca, {limite, skip, campoOrdenacao, ordem });
-
   return listaDiretores;
 }
 

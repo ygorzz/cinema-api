@@ -7,25 +7,18 @@ import {
   updateDiretor,
 } from "../../../../services/diretorService.js";
 import { useEffect, useState } from "react";
+import { mapInputs } from "../../../../helpers/mapInputs.js";
+import { handleChange } from "../../../../helpers/handleChange.js";
 
 const AddContainer = styled(CardModel)``;
 
-function processaBusca(e) {
-  const diretor = {};
-  const form = e.target;
-  for (const input of form) {
-    if (input.name) {
-      diretor[input.name] = input.value;
-    }
-  }
-  return diretor;
-}
+const CAMPOS_INICIAIS = {
+  nome: "",
+  nacionalidade: "",
+};
 
 function AddCard({ diretorToUpdate, setDiretorToUpdate, setReloadDiretores }) {
-  const [campos, setCampos] = useState({
-    nome: "",
-    nacionalidade: "",
-  });
+  const [campos, setCampos] = useState(CAMPOS_INICIAIS);
 
   useEffect(() => {
     function buildFields() {
@@ -35,10 +28,7 @@ function AddCard({ diretorToUpdate, setDiretorToUpdate, setReloadDiretores }) {
           nacionalidade: diretorToUpdate.nacionalidade ?? "",
         });
       } else {
-        setCampos({
-          nome: "",
-          nacionalidade: ""
-        })
+        setCampos(CAMPOS_INICIAIS);
       }
     }
     buildFields();
@@ -47,7 +37,7 @@ function AddCard({ diretorToUpdate, setDiretorToUpdate, setReloadDiretores }) {
   async function handleInsertDiretor(e) {
     e.preventDefault();
     try {
-      const diretor = processaBusca(e);
+      const diretor = mapInputs(e);
       const data = await insertDiretor(diretor);
       alert(data.message);
     } catch (error) {
@@ -59,7 +49,7 @@ function AddCard({ diretorToUpdate, setDiretorToUpdate, setReloadDiretores }) {
   async function handleUpdateDiretor(e) {
     e.preventDefault();
     try {
-      const diretor = processaBusca(e);
+      const diretor = mapInputs(e);
       diretor._id = diretorToUpdate._id;
       const data = await updateDiretor(diretor);
       setReloadDiretores(true);
@@ -71,7 +61,9 @@ function AddCard({ diretorToUpdate, setDiretorToUpdate, setReloadDiretores }) {
   }
 
   return (
-    <AddContainer titulo={diretorToUpdate ? "Atualizar Diretor" : "Adicionar Diretor"}>
+    <AddContainer
+      titulo={diretorToUpdate ? "Atualizar Diretor" : "Adicionar Diretor"}
+    >
       <Subtitle subtitle="Dados" />
       <Form
         onSubmit={diretorToUpdate ? handleUpdateDiretor : handleInsertDiretor}
@@ -81,19 +73,23 @@ function AddCard({ diretorToUpdate, setDiretorToUpdate, setReloadDiretores }) {
           name="nome"
           required
           value={campos.nome}
-          onChange={(e) => setCampos({ ...campos, nome: e.target.value })}
+          onChange={(e) => handleChange(e, setCampos)}
         />
         <Input
           placeholder="Nacionalidade"
           name="nacionalidade"
           value={campos.nacionalidade}
-          onChange={(e) =>
-            setCampos({ ...campos, nacionalidade: e.target.value })
-          }
+          onChange={(e) => handleChange(e, setCampos)}
         />
 
         {diretorToUpdate && (
-          <Button onClick={() => setDiretorToUpdate(null)} type="button" >Cancelar</Button>
+          <Button
+            onClick={() => setDiretorToUpdate(null)}
+            type="button"
+            textColor="#000"
+          >
+            Cancelar
+          </Button>
         )}
         <Button type="submit" color="#c41a1a">
           {diretorToUpdate ? "Salvar Alterações" : "Adicionar"}

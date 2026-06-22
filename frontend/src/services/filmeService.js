@@ -1,14 +1,10 @@
 import axios from "axios";
+import { validaOrdenacao } from "../helpers/validaOrdenacao";
 
 const filmeAPI = axios.create({ baseURL: "http://localhost:3000/filmes" });
 
 async function getFilmes(filtros) {
-    if (filtros.ordenacao) {
-        const campoOrdenacao = "titulo"
-        const separador = ":"
-        const ordem = filtros.ordenacao;
-        filtros.ordenacao = campoOrdenacao + separador + ordem;
-    }
+    filtros.ordenacao = validaOrdenacao(filtros.ordenacao, "titulo");
     const response = await filmeAPI.get("/", {
         params: filtros
     }); 

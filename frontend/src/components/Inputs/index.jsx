@@ -38,7 +38,7 @@ const ButtonElement = styled.button`
 
   background-color: ${(props) => props.color || "#ffffff"};
 
-  color: white;
+  color: ${(props) => props.textColor || "#ffffff"};
 
   font-size: 16px;
   font-weight: 500;

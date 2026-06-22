@@ -7,19 +7,9 @@ import { useEffect, useState } from "react";
 import { Trash, Edit2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Resultado, ResultadoContainer } from "../../../Resultado/index.jsx";
 import { IconesPaginacao } from "../../../IconesPaginacao/index.jsx";
+import { mapInputs } from "../../../../helpers/mapInputs.js";
 
 const ListContainer = styled(CardModel)``;
-
-function processaBusca(e) {
-  const filtros = {};
-  const form = e.target;
-  for (const input of form) {
-    if (input.name && input.value !== "") {
-      filtros[input.name] = input.value;
-    }
-  }
-  return filtros;
-}
 
 function ListCard({ setFilmeToUpdate, reloadFilmes, setReloadFilmes }) {
   const [filmes, setFilmes] = useState([]);
@@ -30,19 +20,16 @@ function ListCard({ setFilmeToUpdate, reloadFilmes, setReloadFilmes }) {
   // Emm caso de update em um filme, limpa a lista de filmes que estava sendo exibida
   useEffect(() => {
     if (!reloadFilmes) return;
-    function updateFetchFilmes() {
-      setFilmes([]);
-      setReloadFilmes(false);
-    }
-    updateFetchFilmes();
+    buscarFilmes(filtrosAtuais, paginaAtual);
+    setReloadFilmes(false);
   }, [reloadFilmes]);
 
   async function handleGetFilmes(e) {
     e.preventDefault();
-    setFilmes([]);
-    setMensagem(null);
+    if (filmes.length > 0) setFilmes([]);
+    if (mensagem) setMensagem(null);
     try {
-      const filtros = processaBusca(e);
+      const filtros = mapInputs(e);
       setFiltrosAtuais(filtros);
       buscarFilmes(filtros, 1);
     } catch (error) {
@@ -51,25 +38,25 @@ function ListCard({ setFilmeToUpdate, reloadFilmes, setReloadFilmes }) {
   }
 
   async function buscarFilmes(filtros, pagina) {
-    setFilmes([])
-    setPaginaAtual(pagina);
     const params = {
       ...filtros,
       pagina,
     };
     try {
       const data = await getFilmes(params);
+      setPaginaAtual(pagina);
       data.result.length === 0 && Object.keys(params).length === 0
         ? setMensagem("Não há filmes cadastrados") //
         : setFilmes(data.result);
     } catch (error) {
-      setMensagem(error.response.data.message);
+      alert(error.response.data.message);
     }
   }
 
   async function handleDeleteFilme(id) {
     try {
       const data = await deleteFilme(id);
+      buscarFilmes(filtrosAtuais, paginaAtual);
       alert(data.message);
     } catch (error) {
       alert(error.response.data.message);

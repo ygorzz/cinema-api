@@ -2,7 +2,7 @@ import RequisicaoIncorreta from "../errors/RequisicaoIncorreta.js";
 
 export default function paginar(req, res, next){
   
-  let {limite = 1, pagina = 1, ordenacao = "_id:-1"} = req.query;
+  let {limite = 8, pagina = 1, ordenacao = "_id:-1"} = req.query;
 
   let {campoOrdenacao, ordem} = processaOrdenacao(ordenacao);
 

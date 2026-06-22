@@ -5,6 +5,7 @@ export const ResultadoContainer = styled.div`
   flex-direction: column;
   gap: 12px;
   margin-top: 24px;
+  width: 100%;
 `;
 
 export const Resultado = styled.div`
